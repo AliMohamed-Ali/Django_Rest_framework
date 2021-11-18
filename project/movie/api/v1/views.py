@@ -3,15 +3,26 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from movie.models import Movie
 from .serializer import MovieSerializer
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, BasePermission
+
+
+class User_deleteMovie(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.groups.filter(name='Can_delete').exists():
+            return True
+        return False
 
 
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
 def hello(request):
     data = {'massage': ' hello from api '}
     return Response(data=data)
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def movie_list(request):
     movie = Movie.objects.all()
     serializer_movie = MovieSerializer(instance=movie, many=True)
@@ -35,9 +46,9 @@ def movie_create(request):
 def movie_detail(request, pk):
     movie = Movie.objects.filter(pk=pk)
     if movie.exists():
-        print(movie)
+        # print(movie)
         movie = movie.first()
-        print(movie)
+        # print(movie)
 
     else:
         return Response(data={"massage": "failed Movies Doesn't exist "}, status=status.HTTP_400_BAD_REQUEST)
@@ -46,6 +57,7 @@ def movie_detail(request, pk):
 
 
 @api_view(['DELETE'])
+@permission_classes([User_deleteMovie])
 def movie_delete(request, pk):
     response = {}
     try:

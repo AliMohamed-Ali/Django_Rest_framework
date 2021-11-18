@@ -19,7 +19,8 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('movie/',include('movie.api.v1.urls'))
+    path('movie/',include('movie.api.v1.urls')),
+    path('account/',include('account.api.v1.urls'))
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static
